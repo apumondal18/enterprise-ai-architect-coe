@@ -20,8 +20,6 @@ def load_pdf_natively(pdf_path: str) -> list[Document]:
 
 # Usage
 docs = load_pdf_natively("./rag_pipeline/insurance-savings.pdf")
-docs.load()
-
 
 splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
 chunks = splitter.split_documents(docs)
