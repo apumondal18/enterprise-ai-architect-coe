@@ -17,9 +17,9 @@ QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 COLLECTION_NAME = "rag_documents"
 VECTOR_SIZE = 384  # all-MiniLM-L6-v2 produces 384-dimensional vectors
 
-print(QDRANT_URL)
-print(QDRANT_API_KEY)
-'''
+#print(QDRANT_URL)
+#print(QDRANT_API_KEY)
+
 # Connect to Qdrant Cloud
 client = QdrantClient(
     url=QDRANT_URL,
@@ -84,4 +84,3 @@ def store_chunks(embedded_chunks, batch_size=100):
         print(f"Uploaded {min(i + batch_size, len(points))}/{len(points)} points")
 
     print("Qdrant storage completed.")
-'''
