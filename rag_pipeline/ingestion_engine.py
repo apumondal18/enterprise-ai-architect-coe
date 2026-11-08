@@ -4,9 +4,14 @@ import json
 import pypdf
 import docx
 import pandas as pd
+import hashlib
+import uuid
+import bm25s
 
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from remote_embeddings import embed_documents
+from bm25_index import build_bm25_index
 from qdrant_store import create_collection, store_chunks
 from langchain_core.documents import Document
 from langchain_text_splitters import (
@@ -213,6 +218,47 @@ def extract_md(file):
     return final_chunks
 
 
+
+#Assign chunk IDs based on document ID and content hash
+def assign_chunk_ids(file, chunks):
+
+    document_id = uuid.uuid5(
+        uuid.NAMESPACE_URL,
+        str(file.resolve()).lower()
+    )
+
+    identified_chunks = []
+
+    for index, chunk in enumerate(chunks):
+
+        content_hash = hashlib.sha256(
+            chunk.page_content.encode("utf-8")
+        ).hexdigest()
+
+        chunk_id = str(
+            uuid.uuid5(
+                document_id,
+                f"{index}:{content_hash}"
+            )
+        )
+
+        metadata = {
+            **chunk.metadata,
+            "document_id": str(document_id),
+            "chunk_id": chunk_id,
+            "chunk_index": index
+        }
+
+        identified_chunks.append(
+            Document(
+                id=chunk_id,
+                page_content=chunk.page_content,
+                metadata=metadata
+            )
+        )
+
+    return identified_chunks
+
 # --------------------------------------------------
 # 4. Unified Ingestion Engine
 # --------------------------------------------------
@@ -241,6 +287,7 @@ for file in files:
         else:
             continue
 
+        chunks = assign_chunk_ids(file, chunks)
         all_chunks.extend(chunks)
 
         print(
@@ -273,7 +320,7 @@ if all_chunks:
     print("\nAll chunks are Document objects:",
           all(isinstance(chunk, Document) for chunk in all_chunks))
 
-
+'''
 #Step 1: embedding generation
 embedded_chunks = embed_documents(
     all_chunks,
@@ -298,3 +345,52 @@ store_chunks(
     embedded_chunks,
     batch_size=100
 )
+'''
+
+def dense_pipeline(chunks):
+
+    print("Starting dense indexing...")
+
+    embedded_chunks = embed_documents(
+        chunks,
+        batch_size=1000
+    )
+
+    create_collection()
+
+    store_chunks(
+        embedded_chunks,
+        batch_size=100
+    )
+
+    print("Dense indexing completed!")
+
+
+def sparse_pipeline(chunks):
+
+    print("Starting sparse indexing...")
+
+    build_bm25_index(chunks)
+
+    print("Sparse indexing completed!")
+
+
+# Run both pipelines concurrently
+
+with ThreadPoolExecutor(max_workers=2) as executor:
+
+    dense_future = executor.submit(
+        dense_pipeline,
+        all_chunks
+    )
+
+    sparse_future = executor.submit(
+        sparse_pipeline,
+        all_chunks
+    )
+
+    dense_future.result()
+    sparse_future.result()
+
+
+print("\n========== INDEXING COMPLETED ==========")

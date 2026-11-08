@@ -17,7 +17,7 @@ print(QDRANT_URL)
 print(QDRANT_API_KEY)
 print(EMBEDDING_API_URL)
 
-COLLECTION_NAME = "rag_documents"
+COLLECTION_NAME = "rag_documents_v2"
 
 # Connect to Qdrant
 client = QdrantClient(
@@ -54,19 +54,44 @@ def retrieve_chunks(query, limit=5):
         with_payload=True
     )
 
-    # Step 3: Display results
+    retrieved_chunks = []
+
+    # Step 3: Collect results
     for index, point in enumerate(results.points, start=1):
 
+        payload = point.payload or {}
+        metadata = payload.get("metadata", {})
+
+        # Get the common chunk ID
+        chunk_id = metadata.get("chunk_id") or payload.get("chunk_id")
+
+        if chunk_id is None:
+            raise ValueError(
+                f"chunk_id missing in Qdrant payload for point {point.id}. "
+                "Add chunk_id to the Qdrant payload."
+            )
+
+        chunk = {
+            "chunk_id": str(chunk_id),
+            "text": payload.get("text", ""),
+            "metadata": metadata,
+            "dense_score": float(point.score),
+            "dense_rank": index
+        }
+
+        retrieved_chunks.append(chunk)
+
+        # Display results
         print(f"\n{'=' * 60}")
         print(f"RESULT {index}")
         print(f"Similarity score: {point.score:.4f}")
-
+        print(f"Chunk ID: {chunk_id}")
         print("\nChunk text:")
-        print(point.payload.get("text", ""))
-
+        print(payload.get("text", ""))
         print("\nMetadata:")
-        print(point.payload.get("metadata", {}))
+        print(metadata)
 
+    return retrieved_chunks
 
 if __name__ == "__main__":
 

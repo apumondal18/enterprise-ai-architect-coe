@@ -1,2 +1,4 @@
 connect_test_Qdrant.py
 .env
+testprogram.py
+__pycache__/

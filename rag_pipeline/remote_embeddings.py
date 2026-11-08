@@ -60,12 +60,19 @@ def embed_documents(documents, batch_size=50):
         batch_size=batch_size
     )
 
+    #Embedding count validation
+    if len(embeddings) != len(documents):
+        raise ValueError(
+            "Embedding count does not match document count"
+        )
+    
     # Combine vectors with their original text and metadata
     embedded_documents = []
 
     for document, embedding in zip(documents, embeddings):
 
         embedded_documents.append({
+            "chunk_id": document.metadata["chunk_id"],
             "text": document.page_content,
             "metadata": document.metadata,
             "embedding": embedding
