@@ -31,8 +31,8 @@ all_chunks = []
 
 # Initialize splitters once
 recursive_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,
-    chunk_overlap=50
+    chunk_size=1500,
+    chunk_overlap=200
 )
 
 header_splitter = MarkdownHeaderTextSplitter(

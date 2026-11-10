@@ -68,11 +68,12 @@ hybrid = HybridRetriever(alpha=0.5, k=60)
 
 # Search
 results = hybrid.search(
-    "How do I download both issue metadata and commit comments?",
-    top_k=5
+    "why does Lewis compare J.M. Barrie's Peter Pan to Harriet Beecher Stowe's Uncle Tom's Cabin?",
+    top_k=10
 )
 
 # Display final results
+
 for rank, result in enumerate(results, start=1):
 
     print(f"\nFinal Rank: {rank}")
