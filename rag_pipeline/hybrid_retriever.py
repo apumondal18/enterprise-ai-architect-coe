@@ -62,7 +62,7 @@ class HybridRetriever:
         # Step 4: Return final results
         return hybrid_results
 
-
+'''
 # Initialise once
 hybrid = HybridRetriever(alpha=0.5, k=60)
 
@@ -82,3 +82,4 @@ for rank, result in enumerate(results, start=1):
     print(f"Dense Rank: {result['dense_rank']}")
     print(f"BM25 Rank: {result['bm25_rank']}")
     print(f"Text: {result['text'][:500]}")
+'''

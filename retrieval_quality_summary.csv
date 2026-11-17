@@ -1,0 +1,6 @@
+question_number,question,relevant_in_top30,hybrid_precision_at_5,hybrid_recall_at_5,hybrid_mrr_at_5,hybrid_ndcg_at_5,reranked_precision_at_5,reranked_recall_at_5,reranked_mrr_at_5,reranked_ndcg_at_5
+1,How many years did the Jesuits consider sufficient to shape a person's beliefs and character through education?,1,0.2,1.0,1.0,1.0,0.2,1.0,1.0,1.0
+2,What did Heine's English engineer's automaton demand after it was created?,0,0.0,,0.0,0.0,0.0,,0.0,0.0
+3,"According to Lewis, what is the single rule that must be observed if the Public is treated like animals in a vast Zoo?",0,0.0,,0.0,0.0,0.0,,0.0,0.0
+4,Why did Lord Leverhulme famously attack his own portrait painted by an eminent English artist?,1,0.2,1.0,1.0,1.0,0.2,1.0,1.0,1.0
+5,"According to Goethe's conversations with Eckermann, what preoccupied Schiller in his youth versus his maturity?",2,0.4,1.0,1.0,1.0,0.4,1.0,1.0,1.0

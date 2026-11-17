@@ -1,62 +1,39 @@
 import requests
 import os
 import time
+
 from dotenv import load_dotenv
-from hybrid_retriever import HybridRetriever
 
 load_dotenv()
+
 BASE_URL = os.getenv("RERANKING_API_URL")
-documents = []
-
-hr01=HybridRetriever()
 
 
-query = "Why does Lewis compare J.M. Barrie's Peter Pan to Harriet Beecher Stowe's Uncle Tom's Cabin?"
+def rerank_documents(query, documents, top_k=5):
 
-hr_results=hr01.search(query,30)
+    if not BASE_URL:
+        raise ValueError("RERANKING_API_URL is missing from .env")
 
-if hr_results is None or len(hr_results)==0:
-    exit("No results found from hybrid retrieval.")
+    if not documents:
+        return [], 0.0
 
-for rank, result in enumerate(hr_results, start=1):
-    documents.append({
-        "chunk_id": result['chunk_id'],
-        "text": result['text']
-    })
+    start_time = time.perf_counter()
 
+    response = requests.post(
+        f"{BASE_URL}/rerank",
+        json={
+            "query": query,
+            "documents": documents
+        },
+        timeout=60
+    )
 
-#print(documents)
+    response.raise_for_status()
 
-'''
-documents = [
-    "Hybrid retrieval combines semantic vector search and keyword-based search.",
-    "BM25 is a sparse retrieval algorithm based on term frequency and inverse document frequency.",
-    "Dense retrieval uses embeddings to find semantically similar documents.",
-    "A cross encoder evaluates the relevance of a query and document together.",
-    "The capital of France is Paris."
-]
-'''
+    rerank_latency = time.perf_counter() - start_time
 
-start_time = time.perf_counter()
-response = requests.post(
-    f"{BASE_URL}/rerank",
-    json={
-        "query": query,
-        "documents": documents
-    },
-    timeout=60
-)
+    results = response.json()["results"]
 
-rerank_latency = time.perf_counter() - start_time
-response.raise_for_status()
+    top_results = results[:top_k]
 
-results = response.json()["results"]
-top_results = results[:5]
-
-for rank, result in enumerate(top_results, start=1):
-    print(f"\nRank: {rank}")
-    print(f"Score: {result['score']:.4f}")
-    print(f"Chunk ID: {result['chunk_id']}")
-    print(f"Document: {result['document']}")
-
-print(f"\nReranking API latency: {rerank_latency:.4f} seconds")
+    return top_results, rerank_latency
