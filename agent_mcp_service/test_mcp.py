@@ -1,25 +1,30 @@
 import asyncio
 from mcp import Client
-from mcp_server_1 import mcp
+from mcp_server_2 import mcp
 
 
 async def main():
 
     async with Client(mcp) as client:
 
-        # Discover available tools
         tools = await client.list_tools()
 
-        print("Available tools:")
-        print(tools)
+        for tool in tools.tools:
+            print(tool.name)
+            print(tool.description)
+            print(tool.input_schema)
 
-        # Call hello tool
         result = await client.call_tool(
-            "hello",
-            {"name": "Apu"}
+            "register_user",
+            {
+                "user": {
+                    "name": "Apu",
+                    "age": 30,
+                    "city": "Bengaluru"
+                }
+            }
         )
 
-        print("Tool response:")
         print(result)
 
 
