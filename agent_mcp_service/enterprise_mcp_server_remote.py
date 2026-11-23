@@ -301,4 +301,10 @@ if __name__ == "__main__":
 
     logger.info("Starting Enterprise MCP Server")
 
-    mcp.run()
+    mcp.run(
+        transport="streamable-http",
+        host="0.0.0.0",
+        port=8080,
+        streamable_http_path="/mcp",
+        stateless_http=False
+    )
