@@ -9,7 +9,7 @@ from langgraph.errors import NodeError
 
 # Import MCP client helper from parent directory
 
-from test_script import call_mcp_tool
+from remote_mcp_call import call_mcp_tool
 
 
 # ============================================================
