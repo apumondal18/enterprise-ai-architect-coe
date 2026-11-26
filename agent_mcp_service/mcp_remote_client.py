@@ -2,7 +2,7 @@ import asyncio
 from mcp import Client
 
 
-SERVER_URL = "http://54.197.36.31:8080/mcp"
+SERVER_URL = "http://13.221.144.96:8080/mcp"
 
 
 async def main():
